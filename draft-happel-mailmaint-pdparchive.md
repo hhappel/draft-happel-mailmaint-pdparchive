@@ -320,6 +320,12 @@ index.json
 ```
 
 > TODO: I18n? Special-use?
+> TODO: Including the mailbox id in the metadata for all the folders
+> TODO: why does our example above use backslashes? shouldn't it use forward slashes like IMAP and presumably JMAP?
+
+Folder names are defined in RFC9051 (IMAP v4 rev2) with great freedom for servers.  Servers may or may not treat mailbox names as case sensitive.  Folder names may even include non-graphic characters, "%" and "\*". Hierarchy separators may even differ among IMAP servers although "/" is probably most common.
+
+Since this specification is new, it is possible to be more constrained.  This specification only supports "\\" as a folder separator.
 
 
 ## Data formats
@@ -520,6 +526,14 @@ Nevertheless, we believe some of the use cases in our [use case section](#use_ca
 ### Synchronizing address books 
 
 Build on [@RFC9610]
+
+
+### Synchronizing mailbox folders
+
+Because servers may differ in which characters they support in folder names, how many levels deep folders may be created, and even in what separator character is used to indicate folder hierarchy, difficulties in synchronizing folder names will definitely arise.  Folder names that are not likely to be widely supported in other systems should be translated for export, because if the exporting system has a consistent translation algorithm, then even if the mailbox name looks different in the importing system it will still be imported consistently.
+
+> TODO: Also define how to include mailbox IDs (JMAP), and that they MUST be included if known;
+> TODO: Also it would be good to include a "display name" in case the server has had to translate the mailbox name for compatibility.  E.g. a server that has a mailbox named "%L33T%", but knows the "%" should not be exported because many servers forbid the "%", would translate the name consistently to _pc_L33T_pc_ or another set of safe characters and include a display name of "%L33T%" for reference and debugging.
 
 ### Blobs and files?
 
