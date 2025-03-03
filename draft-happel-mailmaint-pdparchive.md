@@ -113,9 +113,9 @@ There are at least two scenarios for this:
 
 ### Synchronization
 
-Data portability does not just aim at switching from one service to another one, but to let services share certain personal data upon request of the user. 
+Data portability does not just allow users to switch from one service to another one, but to let users benefit from 3rd party services getting a copy of their data  (at the request of the user).  Simple synchronization features could make this much better.
 
-For example, current online systems for synchronizing tasks and notes, are not often suited to maintaining one's address book on two systems. Re-importing a contact into a system that already has that contact often results in duplicating the exact same contact, whether or not there have been edits, making repeated synchronization practically infeasible. It should be easy to do a significantly better job of this with some attention to object IDs and modification timestamps.
+For example, current online systems that allow importing contacts are not often suited to maintaining one's address book on two systems. Re-importing a contact into a system that already has that contact often results in duplicating the exact same contact, whether or not there have been edits, making repeated synchronization practically infeasible. It should be easy to do a significantly better job of this with some attention to object IDs and modification timestamps.
 
 We however do not attempt to solve two-way synchronization via export files.  It would require significant additional work to allow two systems, neither of which is agreed-upon to be the source of truth, to reliably synchronize changes from both. In comparison, solving one-way synchronization only requires agreed-upon usage of existing fields and values.  
 
@@ -133,7 +133,7 @@ While these use cases may suggest small features that would help these use cases
 
 ### Data persistence
 
-The format MAY be used as a development-time active persistence layer for user data in, e.g., email clients or servers. It is however not aimed to support production-level support for this purpose.
+The format MAY be used as a development-time active persistence layer for user data in, e.g., email clients or applications. It is not intended as, or suitable for, a production-level persistence layer.
 
 ## Technical Goals
 
@@ -149,7 +149,7 @@ Dedicated JMAP API methods for exporting and importing the format described here
 
 Due to its specfics and ubiquituous usage, the Internet Message Format [@RFC5322]; latest revision of [@RFC2822]/[@RFC822]) should be the core of representing individual email data.
 
-In a more coarse granular level, compatibility with existing mailbox persistence schemes such as Maildir or MBOX [@RFC4155] should be considered.
+Compatibility with existing mailbox persistence schemes such as Maildir or MBOX [@RFC4155] should be considered.
 
 ### Interoperability
 
@@ -165,7 +165,7 @@ This format should allow flexible granularity in two ways:
 
 1) It should enable easy access to separate types of data (e.g., emails vs. contacts), e.g. to allow for partial imports or exports
 
-2) While ideally represented as a single file, archives may also span several files due to reasons such as file size restrictions or increments
+2) While ideally representable as a single file, archives may also span several files due to reasons such as file size restrictions or incremental generation logic.
 
 (The ability for a user to export and/or backup an entire email account requires some accomodation of large amounts of data and risks of interruptions in downloads.  Splitting exports into multiple files during export is one possible solution.)
 
@@ -177,7 +177,7 @@ PDPA should allow easy access for local tools (e.g., CLIs). While this may sound
 
 Since certain kinds of personal data might involve large quanties of data, major use cases for PDPA should be realizable in an efficient manner.
 
-For now, this is stated as an abstract guiding principle. Its actual dimensions and trade-offs need to be refined while evolving this specficiation.
+For now, this is stated as an abstract guiding principle. Its actual dimensions and trade-offs need to be refined while evolving this specification.
 
 ## Related work
 
@@ -195,7 +195,7 @@ Our reasoning for using JSON as much as is reasonable:
 
 * We envision an export format being used not just by developers of full IMAP servers but also by developers building task management systems, calendar systems that don't include email, etc.
 * We should minimize requiring multiple libraries to parse different formats. If the Metadata is going to be in JSON, it would really help to have the item data in JSON.
-* This spec will extend the data models somewhat, see for example the requirement to improve synchronization.
+* Personal data formats must be extensible and extensibility for JSON is well-understood.
 
 Using JSON for all the data _except_  EML files was carefully considered.  EML files are rather specialized and more challenging to replace.  Much of email is not structured data but content and involves MIME.  EML is more likely to be a system's native data store, unlike VCARD and VTODO which are most commonly transformed for use in a relational data store for active use.  Finally, email signature implementations like S/MIME and OpenPGP would be less disrupted by keeping EML.
 
@@ -233,7 +233,7 @@ Based on the approach described here, this specification standardizes some behav
 
 # Solution Requirements
 
-These technical requirements on the solution are intended to meet the goals above, adding more specifics about how those goals are intended to be met with the architecture chosen.   This section does not attempt to translate the solution requirements into implementor requirements.
+These technical requirements on the solution are intended to meet the goals above, and to add more specifics about how those goals are intended to be met with the architecture chosen.   This section does not attempt to translate the solution requirements into implementor requirements.
 
 Folder format requirements
 
@@ -268,7 +268,7 @@ Synchronization requirements
 
 ## Folder structure
 
-* Folders can be nested.  Any kind of content here can be nested -- this is a necessary feature for email, but extends to content like contacts that aren't always represented in nested folders.   (TODO: elsewhere, describe the requirements for an importing system to preserve folders or not.)
+* Folders can be nested.  Any kind of content here can be within nested folders -- this is a necessary feature for email, but extends to content like contacts that aren't always represented in nested folders.   (TODO: elsewhere, describe the requirements for an importing system to preserve folders or not.)
 * Names of files do not have to be globally unique.   Indexes and folder contents listings can name files relatively to their location in the archive structure, which means that references may not be resolvable if that context is lost.
 * Individual content items are individual files.  This may not always be the easiest choice for exporters who must generate a large number of files for individually small items (contrast to a JSON stream including all objects) but as an archive format, the individual files allow more clarity in individual handling, transactions and errors.
 
