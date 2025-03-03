@@ -139,17 +139,15 @@ The format MAY be used as a development-time active persistence layer for user d
 
 Besides actual use cases, there are a number of side requirements and goals for PDPA.
 
-### JMAP compatibility
+### Email standards compatibility
 
 Data formats should aim for compatibility with JMAP data formats for the sake of interoperability and synergies in software libraries.
 
 Dedicated JMAP API methods for exporting and importing the format described here, or for related server-to-server transfort partocoals are out of the scope of this document.
 
-### IMAP compatibility
-
 Due to its specfics and ubiquituous usage, the Internet Message Format [@RFC5322]; latest revision of [@RFC2822]/[@RFC822]) should be the core of representing individual email data.
 
-Compatibility with existing mailbox persistence schemes such as Maildir or MBOX [@RFC4155] should be considered.
+This specfication should ideally describe mappings between PDPA and existing mailbox persistence schemes such as Maildir or MBOX [@RFC4155].
 
 ### Interoperability
 
@@ -181,7 +179,7 @@ For now, this is stated as an abstract guiding principle. Its actual dimensions 
 
 ## Related work
 
-Many email server implementors have found it desirable to have one or more file formats for storing email in a file system even when the primary active email storage is more commonly a database.  Examples include [@PST] files (Outlook), NSF (Notes), Google Takeout, maildir, mbox.  File formats are already used for interoperability in many cases even when not standardized.
+Many email server implementors have found it desirable to have one or more file formats for storing email in a file system even when the primary active email storage is more commonly a database.  Examples include [@PST] files (Outlook), NSF (Notes), [@GoogleTakeout], Maildir, MBOX.  File formats are already used for interoperability in many cases even when not standardized.
 
 This specification follows that pattern in order to build on these partial successes.  By standardizing one format, we expect to be able to satisfy use cases that are harder to satisfy with a plurality of formats, such as use cases for server-to-server transfer of email account data during account migrations.  Specifications that explain how to create these archives in different situations can refer to this specification.
 
@@ -338,7 +336,7 @@ TODO: encoding of characters in folder names not allowed by filesystem.
 
 
 Each folder metatadata is described by "folder.json", which has the following format:
-
+```asciidoc=
 ;; /// Or possibly use ranges for 2 types below?
 u32 = uint .size 4
 u64 = uint .size 8
@@ -388,14 +386,14 @@ folder_info = {
   ; in human readable UTF-8 text
   ? comment: tstr,
 }
-
+```
 
 
 EML (.eml) file for each message, in order to avoid reconstructing them. Names of EML files are referenced from the "folder.json" file.
 
 
 Example of folder.json:
-
+```asciidoc=
 {
   "allowed_keywords": ["$Forwarded", "$MDNSent", "$ismailinglist"],
   "last_uid": 3360940,
@@ -419,7 +417,7 @@ Example of folder.json:
      15: ["$answered", "$forwarded"],
   }
 }
-
+```
 
 ### Contacts
 
@@ -432,9 +430,9 @@ vCard [@RFC6350]
 
 ### Calendars
 
-JSCalendar [@RFC9553] (https://www.rfc-editor.org/rfc/rfc8984.html)
+JSCalendar [@RFC9553]
 
-iCalendar [@RFC5545],
+iCalendar [@RFC5545]
 
 Although CalDAV servers are fairly common, they support the older VEVENT and VTODO syntax to represent calendar events and tasks in protocol messages.  This specification requires the JSCalendar syntax instead. Either way, a server building an archive is likely transforming an internal implementation-specific relational data format to an export format.  
 
@@ -505,7 +503,7 @@ Recommendations:
 
 Note on _similar enough_: This specification requires nuance in order to allow both reasonably consistent synchronization and reasonable behavior in a wide variety of use cases and implementations.  The language above is intended to give implementors both guidance and wiggle room.  For example, the importer could convert a DTSTART time from UTC to the user's local time and save it as the displayed start time. Later, reimporting the same object with the same UID, the importing code could be smart enough to realize that the time hasn't _actually_ changed, and avoid changing the 'updated' timestamp or creating a conflicting event.  This logic could be implemented by saving separate fields (imported time vs display time), by keeping a log of updates (log entry stating that the system auto-converted start time from X to Y), or by other clever algorithms. Thus, the clever implementation can avoid the appearance of an object that changes every time the calendar is synchronized.
 
-Note on _updated_: The definition of 'updated' in JSContact [RFC 9553] is not rigorous or nuanced. "when the data in the Card was last modified" could refer to several instances of the card -- its internal implementation, its representation in an email share, its representation in an HTTP GET response [rfc6352].   It's not specified whether 'updated' is the same as REV in VCard [RFC 6350], which is defined differently.  Neither definition explicitly covers vendor-specific fields.  Thus, this specification makes additional recommendations for handling 'updated': 
+Note on _updated_: The definition of 'updated' in JSContact [@RFC9553] is not rigorous or nuanced. "when the data in the Card was last modified" could refer to several instances of the card -- its internal implementation, its representation in an email share, its representation in an HTTP GET response [@RFC6352].   It's not specified whether 'updated' is the same as REV in VCard [@RFC6350], which is defined differently.  Neither definition explicitly covers vendor-specific fields.  Thus, this specification makes additional recommendations for handling 'updated': 
 
 * The value of 'updated' SHOULD only change when two conditions hold: the end-user makes a decision to change a value of a user-visible field, AND the export of the JSContact shows a different value.  
 * Thus, non-user-visible fields like 'version' could be changed without causing the 'updated' value to change.  A value such as 'language' could be set without changing 'updated' (if an implementation infers the language tag and begins to include 'fr-CA' as the language value in exports instead of no language, nevertheless this doesn't change the user-visible content). 
@@ -533,7 +531,7 @@ Systems that support mailbox IDs MUST include them in exports.  Systems that do 
 
 ### Blobs and files?
 
-Reference [RFC@9404]? 
+Reference [@RFC9404]? 
 
 # Implementation status
 
@@ -558,6 +556,17 @@ tbd.
 register .pdpa?
 
 {backmatter}
+
+
+<reference anchor="GoogleTakeout" target="https://takeout.google.com/settings/takeout">
+   <front>
+      <title>Google Takeout</title>
+      <author>
+        <organization>Google</organization>
+      </author>
+      <date>2025</date>
+   </front>
+</reference>
 
 <reference anchor="PST" target="https://learn.microsoft.com/en-us/openspecs/office_file_formats/ms-pst/141923d5-15ab-4ef1-a524-6dce75aae546">
    <front>
