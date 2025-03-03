@@ -153,9 +153,7 @@ Compatibility with existing mailbox persistence schemes such as Maildir or MBOX 
 
 ### Interoperability
 
-It should be mostly possible to use exported personal data with different software or services. 
-
-Full fidelity, especially of non-standardized email features, is not a requirement (though vendor-specific properties can usually be used for this non-disruptively and the format is extensible by future standards).
+It should be mostly possible to use personal data exports from one system with different software or services.  When a source exports personal data it can include all the information it would need for a fully-functional import, _however_ destination systems running different software may not be able to import all of that information (especially if it includes non-standard features) and use it exactly the same way.  This specification does not attempt to achieve perfect interoperability between diverse systems, but instead to make reasonable tradeoffs.
 
 ### Extensibility
 
