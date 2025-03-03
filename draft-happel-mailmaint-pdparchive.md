@@ -5,7 +5,7 @@ workgroup = "Network Working Group"
 
 [seriesInfo]
 name = "Internet-Draft"
-value = "draft-happel-mailmaint-pdparchive-00"
+value = "draft-happel-mailmaint-pdparchive-01"
 stream = "IETF"
 status = "standard"
 
