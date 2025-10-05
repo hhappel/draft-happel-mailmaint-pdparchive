@@ -153,9 +153,7 @@ In a more coarse granular level, compatibility with existing mailbox persistence
 
 ### Interoperability
 
-It should be mostly possible to use the data with different software or services. 
-
-Full fidelity, especially of non-standardized email features, is not a requirement (though vendor-specific properties can usually be used for this non-disruptively and the format is extensible by future standards).
+It should be mostly possible to use personal data exports from one system with different software or services.  When a source exports personal data it can include all the information it would need for a fully-functional import, _however_ destination systems running different software may not be able to import all of that information (especially if it includes non-standard features) and use it exactly the same way.  This specification does not attempt to achieve perfect interoperability between diverse systems, but instead to make reasonable tradeoffs.
 
 ### Extensibility
 
@@ -421,12 +419,255 @@ Example of folder.json:
 
 ### Contacts
 
-JSContact [@RFC9553]
+JSContact [@RFC9553] and RFC9610
+
 * uid property uniquely identifies - 
 * updated property gives some hint at merging changes but requires additional specification to be usable for sync
 * we also need to reference RFC6350 which defines uid and 'rev'
 
-vCard [@RFC6350]
+vCard [@RFC6350]  - how to reference
+
+### Using RFC9553 JSContact Items
+
+* updated MUST be included.
+* If each contact is a JSON file, then how do contacts appear in address books - do they have a field that references the address book or is it by file location? RFC 9610 says that contacts have "id" property and "addressBookIds" property in addition to all the ones in RFC9553.
+
+
+Example full contents of "contact1.json" including RFC9610 "id" and "addressBookIds" properties.
+
+```
+{
+   "@type": "Card",
+   "version": "1.0",
+   "uid": "22B2C7DF-9120-4969-8460-05956FE6B065",
+   "id": 
+   "updated": "2021-10-31T22:27:10Z",
+   "kind": "individual",
+   "addressBookIds": [
+      "062adcfa-105d-455c-bc60-6db68b69c3f3"
+   ]
+   "name": {
+       "components": [
+         { "kind": "given", "value": "John" },
+         { "kind": "surname", "value": "Doe" }
+       ],
+       "isOrdered": true
+   },
+   "relatedTo": {
+      "urn:uuid:f81d4fae-7dec-11d0-a765-00a0c91e6bf6": {
+         "relation": {
+           "friend": true
+         }
+       },
+       "8cacdfb7d1ffdb59@example.com": {
+         "relation": {}
+       }
+   },
+   "nicknames": {
+      "k391": {
+         "name": "Johnny"
+      }
+   },
+   "organizations": {
+      "o1": {
+        "name": "ABC, Inc.",
+        "units": [
+          { "name": "North American Division" },
+          { "name": "Marketing" }
+        ],
+        "sortAs": "ABC"
+      }
+   },
+   "speakToAs": {
+     "grammaticalGender": "neuter",
+     "pronouns": {
+       "k19": {
+         "pronouns": "they/them",
+         "pref": 2
+       },
+       "k32": {
+         "pronouns": "xe/xir",
+         "pref": 1
+       }
+     }
+   }, 
+   "titles": {
+     "le9": {
+       "kind": "title",
+       "name": "Research Scientist"
+     },
+     "k2": {
+       "kind": "role",
+       "name": "Project Leader",
+       "organizationId": "o1"
+     }
+   },
+   "localizations": {
+      "fr": 
+        {"titles/k2/name": "chercheur scientifique"}
+   }
+   "emails": {
+     "e1": {
+       "contexts": {
+         "work": true
+       },
+       "address": "jqpublic@xyz.example.com"
+     },
+     "e2": {
+       "address": "jane_doe@example.com",
+       "pref": 1
+     }
+   },
+
+   "onlineServices": {
+     "x1": {
+       "uri": "xmpp:alice@example.com"
+     },
+     "x2": {
+       "service": "Mastodon",
+       "user": "@alice@example2.com",
+       "uri": "https://example2.com/@alice"
+     }
+   },
+   "phones": {
+     "tel0": {
+       "contexts": {
+         "private": true
+       },
+       "features": {
+         "voice": true
+       },
+       "number": "tel:+1-555-555-5555;ext=5555",
+       "pref": 1
+     },
+     "tel3": {
+       "contexts": {
+         "work": true
+       },
+       "number": "tel:+1-201-555-0123"
+     }
+   },
+   "schedulingAddresses": {
+     "sched1": {
+       "uri": "mailto:janedoe@example.com"
+     }
+   },
+   "addresses": {
+     "k23": {
+       "contexts": {
+         "work": true
+       },
+       "components": [
+         { "kind": "number", "value": "54321" },
+         { "kind": "separator", "value": " " },
+         { "kind": "name", "value": "Oak St" },
+         { "kind": "locality", "value": "Reston" },
+         { "kind": "region", "value": "VA" },
+         { "kind": "separator", "value": " " },
+         { "kind": "postcode", "value": "20190" },
+         { "kind": "country", "value": "USA" }
+       ],
+       "countryCode": "US",
+       "defaultSeparator": ", ",
+       "isOrdered": true
+     }
+   },
+   "media": {
+     "res1": {
+       "kind": "photo",
+       "uri": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAASABIAAD/4..."
+     }
+   },
+
+   "anniversaries": {
+     "k8": {
+       "kind": "birth",
+       "date": {
+         "year": 1953,
+         "month": 4,
+         "day": 15
+       }
+     }
+   },
+   "keywords": {
+     "internet": true,
+     "IETF": true
+   },
+
+   "notes": {
+     "n1": {
+       "note": "Open office hours are 1600 to 1715 EST, Mon-Fri",
+       "created": "2022-11-23T15:01:32Z",
+       "author": {
+         "name": "John"
+       }
+     }
+   }
+}
+```
+
+### Using RFC9610 address book objects
+
+* REmove the notFound field
+* Remove the "state" field
+* Copy the "accountId" into each address book
+* Do we need an AddressBook object type? 
+* So inconsistent with JSContacts - no @type value
+* Also these use 'id' rather than 'uid' argh. 
+
+Example of the 2 address books in figure 1 of RFC 9610 - protocol elements are removed, leaving data payloads very similar but NOT identical to what's in 9610.
+
+address-book1.json contains:
+
+
+```
+{
+   "accountId": "a0x9",
+   "id": "062adcfa-105d-455c-bc60-6db68b69c3f3",
+   "name": "Personal",
+   "description": null,
+   "sortOrder": 0,
+   "isDefault": true,
+   "isSubscribed": true,
+   "shareWith": {
+     "3f1502e0-63fe-4335-9ff3-e739c188f5dd": {
+       "mayRead": true,
+       "mayWrite": false,
+       "mayShare": false,
+       "mayDelete": false
+     }
+   },
+   "myRights": {
+     "mayRead": true,
+     "mayWrite": true,
+     "mayShare": true,
+     "mayDelete": false
+   }
+ } 
+```
+
+address-book2.json contains
+
+```
+ {
+      "accountId": "a0x9",
+      "id": "cd40089d-35f9-4fd7-980b-ba3a9f1d74fe",
+      "name": "Autosaved",
+      "description": null,
+      "sortOrder": 1,
+      "isDefault": false,
+      "isSubscribed": true,
+      "shareWith": null,
+      "myRights": {
+        "mayRead": true,
+        "mayWrite": true,
+        "mayShare": true,
+        "mayDelete": false
+      }
+    }
+```
+
+
 
 ### Calendars
 
