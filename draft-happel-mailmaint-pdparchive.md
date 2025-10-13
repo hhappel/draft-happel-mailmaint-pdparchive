@@ -513,18 +513,6 @@ exported because they're not in the same address book, the 'relatedTo' value may
 in the export even if not resolvable by some users of the export file. 
 
 
-TODO: Notes for a Security Considerations section later.  It is a tradeoff between privacy
-and usefulness for an implementation to include references to objects that are not themselves
-in the export.  On the privacy side, it may reveal some information to know that "John Doe" 
-has a relation typed as 'friend' even if no further information about the friend is exported.
-On the usefulness side, if a user decides to export a specific address book and manipulate
-it then re-import it to the same system, including the 'relatedTo' contents with the 
-mysterious friend is perfectly workable.  Specific implementations may know more about the
-tradeoffs and can make decisions whether to include opaque references to other objects
-not in the export. 
-
-
-
 #### Group Contact Items
 
 Group contact items also refer to other contact items.  A file with an arbitrary name like "contact2.json"
