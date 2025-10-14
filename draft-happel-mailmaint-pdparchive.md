@@ -334,6 +334,27 @@ Folder names are encoded in UTF-8.
 
 TODO: how to signal removal of a folder in an incremental archive? Need to add some kind of tombstone mechanism.
 
+Each folder metatadata is described by "folder.json", which has the following format:
+
+| Attribute Name    | Type     | Mandatory? | Comment |
+| ----------------- | :------: | ---------- | ------- |
+| allowed_keywords | array of strings (IMAP keywords) | No |PERMANENTFLAGS minus "\\*" [@RFC3501]|
+| last_uid | unsigned 32 bit integer | Yes | Last UID assigned in the folder. It is UIDNEXT value minus 1 [@RFC3501]|
+| recent_uid | unsigned 32 bit integer | No | Lowest UID of a message with the \Recent flag [@RFC3501]|
+| uidvalidity | unsigned 32 bit integer | Yes | UIDVALIDITY value [@RFC3501]|
+| is_subscribed | boolean | Yes | Is the folder returned by IMAP LSUB? [@RFC3501] |
+| myrights | string | No |See Section 3.5 of [@RFC4314]. For example "rwiptsldaex"|
+| highest_modseq | unsigned 64 bit integer | No |HIGHESTMODSEQ value [@RFC7162]|
+| role | string | No |[@RFC6154] SPECIAL-USE value. E.g. "inbox", "sent", "drafts", "junk", etc.|
+| sort_order |  | No |See Section 2, [@RFC8621]|
+| uids | map from UIDs to strings (relative filenames of messages) | Yes | Mapping from UIDs to corresponding message files included in the archive|
+| flags | map from UIDs to array of strings | Yes |IMAP flags assigned to the message, excluding \Recent|
+| modseqs | map from UIDs to unsigned 64 bit integers (modsequences) | No |Per message MODSEQ values [@RFC7162]|
+| original_name | string | No |Original folder name (relative to its parent, if any) if the name can't be represented in filesystem, e.g. if it includes special characters|
+| comment | string | No |Can include information about partial export or filter used in human readable UTF-8 text|
+| removed | array of unsigned 32 bit integers | No |List of messages (UIDs) removed since the last export |
+
+
 CDDL description of "folder.json" is included below:
 ```asciidoc=
 ;; /// Or possibly use ranges for 2 types below?
