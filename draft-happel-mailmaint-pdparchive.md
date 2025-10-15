@@ -455,7 +455,7 @@ See JMAP Calendars [ref todo] section 1.4.1 for when the `uid` property can appe
 multiple recurrences of the same underlying event. 
 * The `updated` property is mandatory in JSCalendar and MUST be included. 
 * The `sequence` value is optional in JSCalendar but SHOULD be included if available.
-* The @type property for one of these items MUST be "Event", "Task" or "Group".
+* The `@type` property for one of these items MUST be "Event", "Task" or "Group".
 * Recurrence rules SHOULD be fully exported, unless it's clear from the use case
 or user request that the
 destination for the data wants expanded recurrences within a specific time period. 
@@ -521,7 +521,7 @@ A file with an arbitrary name, such as calendar1.json, in a directory (e.g., \ca
   }
 }
 ```
-The uid here corresponds to the ID used in the calendarIds property of the individual event item. 
+The `uid` value here corresponds to the ID used in the calendarIds property of the individual event item. 
 
 #### Tasks
 
