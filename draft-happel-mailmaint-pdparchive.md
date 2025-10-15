@@ -430,20 +430,19 @@ explains how to use the fields and structures of those specifications within a P
 
 Individual contact items build on JSContact [@RFC9553] which builds on VCard[@RFC6350]. 
 
-* The globally unique 'uid' property is mandatory in JSContact and MUST be included in PDP archive.
-* The 'updated' property is optional in JSContact but MUST be included in PDP archive.  
-* The 'rev' property defined in VCard (RFC6350), which is not included in JSContact (RFC9553),
+* The globally unique `uid` property is mandatory in JSContact and MUST be included in PDP archive.
+* The `updated` property is optional in JSContact but MUST be included in PDP archive.  
+* The `rev` property defined in VCard (RFC6350), which is not included in JSContact (RFC9553),
 may already be available in implementations.  It may also be included as a field on a contact,
 in which case it is a simple value field holding a timestamp.
-* TODO: What does 'version' property mean in our context.  Do we ask the implementation to 
-make it a PDPArchive version? or does it refer to a JSContact version (1.0) or a VCard version (4.0)?
-* The "@type" property should be "ContactCard".  Note that JSContact [@RFC9553] uses a value
+
+* The `@type` property should be "ContactCard".  Note that JSContact [@RFC9553] uses a value
 of "Card" for @type and registers that in https://www.iana.org/assignments/jscontact/jscontact.xhtml,
 but JMAP for Contacts uses "ContactCard" and registers that in https://www.iana.org/assignments/jmap/jmap.xhtml.
 
 
-We make some specific requirements on the value of the 'updated' property so that it can be 
-useful for synchronization.  See the section on 'updated' and 'uid' specifically [TODO: 
+We make some specific requirements on the `updated` value so that it can be 
+useful for synchronization.  See the section on `updated` and `uid` specifically [TODO: 
 cross-reference other section].
 
 When the structured data is prepared, a contact can be exported in a file with an arbitrary name
@@ -493,7 +492,7 @@ For example, a file called 'contact1.json' could contain:
 
 For clarity, this example includes:
 * How a card can reference address books which are exported as separate files in the overall export
-* How a card can reference other cards using 'relatedTo'
+* How a card can reference other cards using `relatedTo`
 * A card can contain arbitrary notes - those are not necessarily exported as separate files even 
 though notes are also an object that can be included as individual files in a PDPArchive export.
 
@@ -508,8 +507,8 @@ For example, if the user chose to export only a public address book containing t
 contact, and not the private "Wedding guests" address book that John Doe also belonged to,
 then the private address book would either appear as an unresolvable ID or be cleaned up
 so that it didn't appear (implementor's choice).  Likewise, when "John Doe" is exported
-as part of a single address book export, but the 'friend' relation in 'relatedTo' is not 
-exported because they're not in the same address book, the 'relatedTo' value may be included
+as part of a single address book export, but the `friend` relation in `relatedTo` is not 
+exported because they're not in the same address book, the `relatedTo` value may be included
 in the export even if not resolvable by some users of the export file. 
 
 
@@ -554,9 +553,9 @@ also.
 Individual address book objects are returned in JMAP protocol messages with protocol wrappers.
 It is the items inside the "list" element inside "AddressBook/get" that are nearly ready to 
 be represented as individual files in a PDPArchive. However, some things are missing:
-* 'uid' is called 'id' in JMAP for Contacts but this specification REQUIRES 'uid'.
-* 'updated' is required
-* The '@type' of AddressBook should be included within the data
+* `uid` is called 'id' in JMAP for Contacts but this specification REQUIRES `uid`.
+* `updated` is required
+* The `@type` of AddressBook should be included within the data
 
 
 This example copies the examples in RFC9610 so that interoperability between this spec and that one 
@@ -615,7 +614,7 @@ address-book2.json would contain:
 ```
 
 
-Note that the first example includes a "shareWith" value, showing that the user's AddressBook has been
+Note that the first example includes a `shareWith` value, showing that the user's AddressBook has been
 shared with in this case one other principal with the id "3f1502e0-63fe-4335-9ff3-e739c188f5dd".  
 This information can be exported and may be quite useful in case of backup/restore use cases. 
 However, it may not be useful in other administrative domains where the same concept of principals
