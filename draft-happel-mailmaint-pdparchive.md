@@ -428,33 +428,121 @@ JSContact [@RFC9553]
 
 vCard [@RFC6350]
 
-### Calendars
+### Calendar events, tasks and groups
 
-JSCalendar [@RFC9553]
+JSCalendar [@RFC8984] is the basis for representing events, tasks and groups in JSON. 
+This section explains how to export individual events and tasks within an archive.
+JMAP for Calendars (https://datatracker.ietf.org/doc/draft-ietf-jmap-calendars/) 
+does provide some additional considerations when producing calendar data from a JMAP
+system or to be consumed by a JMAP system, so it is also a normative reference.
 
-iCalendar [@RFC5545]
+Note on CalDAV compatibility: Although CalDAV servers are fairly common, they support the 
+older VEVENT and VTODO syntax.  This specification requires the JSCalendar syntax instead. 
+Either way, a server building a personal data archive is likely transforming an internal 
+implementation-specific relational data format to an export format.  
 
-Although CalDAV servers are fairly common, they support the older VEVENT and VTODO syntax to represent calendar events and tasks in protocol messages.  This specification requires the JSCalendar syntax instead. Either way, a server building an archive is likely transforming an internal implementation-specific relational data format to an export format.  
+Note on ETag: CalDAV servers use the event's UID to identify the same object, and use ETags 
+to identify changed events, so that a CalDAV client may make sure it has the version a 
+server has before it updates an item, solving the lost-update problem.  Since this 
+specification doesn't attempt to solve the lost-update problem as well as client-server 
+protocols can, and since JSCalendar does not include the ETag of a calendar event in any way, 
+this specification does not include any requirements for ETags.
 
-CalDAV servers use the event's UID to identify the same object received more than once (e.g. once in an invitation and again in an import).  CalDAV servers use ETags to identify changed events, so that a CalDAV client may make sure it has the version a server has before it updates an item, solving the lost-update problem.  
+Notes on specific fields:
 
-Since this specification doesn't attempt to solve the lost-update problem as well as client-server protocols do, and since JSCalendar does not include the ETag of a calendar event in any way, this specification does not include any requirements for ETags.
+* The globally unique `uid` property is mandatory in JSCalendar and MUST be included.
+See JMAP Calendars [ref todo] section 1.4.1 for when the `uid` property can appear the same for
+multiple recurrences of the same underlying event. 
+* The `updated` property is mandatory in JSCalendar and MUST be included. 
+* The `sequence` value is optional in JSCalendar but SHOULD be included if available.
+* The `@type` property for one of these items MUST be "Event", "Task" or "Group".
+* Recurrence rules SHOULD be fully exported, unless it's clear from the use case
+or user request that the
+destination for the data wants expanded recurrences within a specific time period. 
+* The `calendarIds` field defined in JMAP Calendars is REQUIRED in order to match up
+events to the calendar they are supposed to appear in.  
 
-(Alexey & Hans-Joerg - what's your opinion on this? JSCalendar doesn't include ETag and obviously it's just fine?)
 
-### Tasks
+For example, a file called event1.json could contain:
 
-JSCalendar [@RFC9553] defines the JSON format used for tasks.
-
-
-```asciidoc=
+```json
 {
-  "@type": "Task",
+  "@type": "Event",
   "uid": "2a358cee-6489-4f14-a57f-c104db4dc2f2",
   "updated": "2020-01-09T14:32:01Z",
-  "title": "Do something"
+  "title": "Board Meeting",
+  "start": "2024-10-25T09:00:00",
+  "timeZone": "Europe/London",
+  "duration": "PT1H30M",
+  "participants": {
+    "1": {
+      "@type": "Participant",
+      "name": "Jane Doe",
+      "sendTo": {
+        "mailto": "jane@example.com"
+      },
+      "roles": {
+        "attendee": true
+      }
+    }
+  },
+  "calendarIds": {
+    "062adcfa-105d-455c-bc60-6db68b69c3f3": true
+  }
 }
 ```
+The event object includes a calendarIds property, which links it to the calendar collection it belongs to.
+
+### Calendar Collection Items
+
+Calendar collection items are built using JMAP for Calendars [REF TODO - still I-D].  
+
+If a system exports events belonging to calendars, it SHOULD also export the referenced Calendar objects.
+
+
+A file with an arbitrary name, such as calendar1.json, in a directory (e.g., \calendars\calendar2\) would contain the calendar's metadata:
+
+
+```json
+{
+  "@type": "Calendar",
+  "uid": "062adcfa-105d-455c-bc60-6db68b69c3f3",
+  "updated": "2020-01-09T14:32:01Z",
+  "name": "Work Calendar",
+  "color": "#123456",
+  "sortOrder": 0,
+  "isDefault": true,
+  "isSubscribed": true,
+  "myRights": {
+    "mayRead": true,
+    "mayWrite": true,
+    "mayShare": true,
+    "mayDelete": false
+  }
+}
+```
+The `uid` value here corresponds to the ID used in the calendarIds property of the individual event item. 
+
+#### Tasks
+
+Tasks are also defined by the JSCalendar specification [@RFC8984] using the "Task" object type. 
+As with events, tasks MUST include the uid and updated fields to support synchronization.
+
+For example, a file called task1.json could contain:
+
+```json
+{
+  "@type": "Task",
+  "uid": "7b0f69a6-6e3e-4f1b-85d8-c89b43d2f2a1",
+  "updated": "2022-11-23T15:01:32Z",
+  "title": "Submit Quarterly Report",
+  "status": "in-progress",
+  "priority": 1,
+  "due": "2024-12-31T23:59:59Z"
+}
+```
+
+
 
 ### Notes
 
