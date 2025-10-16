@@ -332,10 +332,9 @@ Each IMAP/JMAP folder is represented as subdirectory under "mail" directory. For
 
 Folder names are encoded in UTF-8.
 
-TODO: encoding of characters in folder names not allowed by filesystem.
+TODO: how to signal removal of a folder in an incremental archive? Need to add some kind of tombstone mechanism.
 
-
-Each folder metatadata is described by "folder.json", which has the following format:
+CDDL description of "folder.json" is included below:
 ```asciidoc=
 ;; /// Or possibly use ranges for 2 types below?
 u32 = uint .size 4
@@ -381,10 +380,16 @@ folder_info = {
 
   ; Maps UIDs to the corresponding modseqs (u64). See RFC 7162.
   ? modseqs: modseq_map,
+
+  ; Original folder name if the name can't be represented in filesystem
+  ? original_name: tstr,
   
   ; Can include information about partial export or filter used
   ; in human readable UTF-8 text
   ? comment: tstr,
+
+  ;; The following attributes are only used for incremental exports:
+  ? removed: [u32],
 }
 ```
 
@@ -392,13 +397,13 @@ folder_info = {
 EML (.eml) file for each message, in order to avoid reconstructing them. Names of EML files are referenced from the "folder.json" file.
 
 
-Example of folder.json:
+Example of folder.json (full export):
 ```asciidoc=
 {
   "allowed_keywords": ["$Forwarded", "$MDNSent", "$ismailinglist"],
-  "last_uid": 3360940,
+  "last_uid": 16,
   "highest_modseq": 6371729,
-  "recent_uid": 3360940,
+  "recent_uid": 15,
   "uidvalidity": 1107190787,
   "is_subscribed": true,
   "role": "sent",
@@ -408,13 +413,13 @@ Example of folder.json:
   "uids": {
      1: "msg-1.eml",
      3: "msg-3.eml",
-     15: "imported-ABC.eml",
+     15: "imported-ABC.eml"
   },
 
   "flags": {
      1: ["$seen"],
      3: ["$seen", "$flagged"],
-     15: ["$answered", "$forwarded"],
+     15: ["$answered", "$forwarded"]
   }
 }
 ```
