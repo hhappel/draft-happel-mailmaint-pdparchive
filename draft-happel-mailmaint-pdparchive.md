@@ -426,12 +426,208 @@ Example of folder.json (full export):
 
 ### Contacts
 
-JSContact [@RFC9553]
-* uid property uniquely identifies - 
-* updated property gives some hint at merging changes but requires additional specification to be usable for sync
-* we also need to reference RFC6350 which defines uid and 'rev'
+VCard [@RFC6350] has long been the basis for address book and contact data representation in
+structured data files.  The specifications for JSContact [@RFC9553] and JMAP for Contacts [@RFC9610]
+do a bunch of the work to explain how to do this in JSON, and in particular RFC9610 explains
+how to express references between objects (e.g. an address book and a contact in that address 
+book) which is useful for a full export that can have its references reconstructed.  This section
+explains how to use the fields and structures of those specifications within a PDP Archive export.
 
-vCard [@RFC6350]
+#### Individual Contact Items
+
+Individual contact items build on JSContact [@RFC9553] which builds on VCard[@RFC6350]. 
+
+* The globally unique `uid` property is mandatory in JSContact and MUST be included in PDP archive.
+* The `updated` property is optional in JSContact but MUST be included in PDP archive.  
+* The `rev` property defined in VCard (RFC6350), which is not included in JSContact (RFC9553),
+may already be available in implementations.  It may also be included as a field on a contact,
+in which case it is a simple value field holding a timestamp.
+
+* The `@type` property should be "ContactCard".  Note that JSContact [@RFC9553] uses a value
+of "Card" for @type and registers that in https://www.iana.org/assignments/jscontact/jscontact.xhtml,
+but JMAP for Contacts uses "ContactCard" and registers that in https://www.iana.org/assignments/jmap/jmap.xhtml.
+
+
+We make some specific requirements on the `updated` value so that it can be 
+useful for synchronization.  See the section on `updated` and `uid` specifically [TODO: 
+cross-reference other section].
+
+When the structured data is prepared, a contact can be exported in a file with an arbitrary name
+using a limited set of characters suitable for interoperability across filesystems. [TODO: we 
+need to define that elsewhere].  
+
+For example, a file called 'contact1.json' could contain:
+
+```
+{
+   "@type": "ContactCard",
+   "version": "1.0",
+   "uid": "22B2C7DF-9120-4969-8460-05956FE6B065",
+   "id": 
+   "updated": "2021-10-31T22:27:10Z",
+   "kind": "individual",
+   "addressBookIds": [
+      "062adcfa-105d-455c-bc60-6db68b69c3f3"
+   ]
+   "name": {
+       "components": [
+         { "kind": "given", "value": "John" },
+         { "kind": "surname", "value": "Doe" }
+       ],
+       "isOrdered": true
+   },
+
+   "relatedTo": {
+      "urn:uuid:f81d4fae-7dec-11d0-a765-00a0c91e6bf6": {
+         "relation": {
+           "friend": true
+         }
+       }
+   },
+
+   "notes": {
+     "n1": {
+       "note": "Open office hours are 1600 to 1715 EST, Mon-Fri",
+       "created": "2022-11-23T15:01:32Z",
+       "author": {
+         "name": "John"
+       }
+     }
+   }
+}
+```
+
+For clarity, this example includes:
+* How a card can reference address books which are exported as separate files in the overall export
+* How a card can reference other cards using `relatedTo`
+* A card can contain arbitrary notes - those are not necessarily exported as separate files even 
+though notes are also an object that can be included as individual files in a PDPArchive export.
+
+
+TODO:  figure out if these can have RFC9610 "id" field
+
+Because a ContactCard item can reference an AddressBook item, if a system exports contacts 
+belonging to address books it SHOULD also export the referenced AddressBook objects.  Likewise,
+it SHOULD export the other ContactCard objects that are referenced in the 'relatedTo' field.
+A permission or scope inconsistency would be one reason why the exporting system would not do so.  
+For example, if the user chose to export only a public address book containing the "John Doe"
+contact, and not the private "Wedding guests" address book that John Doe also belonged to,
+then the private address book would either appear as an unresolvable ID or be cleaned up
+so that it didn't appear (implementor's choice).  Likewise, when "John Doe" is exported
+as part of a single address book export, but the `friend` relation in `relatedTo` is not 
+exported because they're not in the same address book, the `relatedTo` value may be included
+in the export even if not resolvable by some users of the export file. 
+
+
+#### Group Contact Items
+
+Group contact items also refer to other contact items.  A file with an arbitrary name like "contact2.json"
+could include:
+
+```
+{
+   "@type": "ContactCard",
+   "kind": "group",
+   "name": {
+     "full": "The Doe family"
+   },
+   "uid": "urn:uuid:ab4310aa-fa43-11e9-8f0b-362b9e155667",
+   "updated": "2021-10-31T22:27:10Z",
+   "members": {
+     "urn:uuid:03a0e51f-d1aa-4385-8a53-e29025acd8af": true,
+     "urn:uuid:b8767877-b4a1-4c70-9acc-505d3819e519": true
+   }
+}
+```
+
+As with individual ContactCard items referencing objects that are not exported at the same time,
+a group contact can contain references that are not resolvable within the export.  If the user
+chooses to export all address books then presumably the "The Doe family" group members can 
+all be found somewhere in the export, but if they export only the address book containing
+"The Doe family" group and not the address books containing individual members, those IDs
+would not be found in the export. 
+
+
+
+### Using RFC9610 address book objects
+
+The VCard [@RFC6350] specifications never defined a representation for address books.  Nor did
+JSContact [@RFC9553].  JMAP for Contacts [@RFC9610] does.  Its model is clearly that of 
+non-exclusive collection membership: a Contact item may appear with the same UID in multiple
+Address Books, and if the Contact item with that UID is updated in one it is updated in the other 
+also.  
+
+Individual address book objects are returned in JMAP protocol messages with protocol wrappers.
+It is the items inside the "list" element inside "AddressBook/get" that are nearly ready to 
+be represented as individual files in a PDPArchive. However, some things are missing:
+* `uid` is called 'id' in JMAP for Contacts but this specification REQUIRES `uid`.
+* `updated` is required
+* The `@type` of AddressBook should be included within the data
+
+
+This example copies the examples in RFC9610 so that interoperability between this spec and that one 
+is clear.  
+
+A file with an arbitrary name like address-book1.json would contain:
+
+
+```
+{
+   "@type": "AddressBook",
+   "uid": "062adcfa-105d-455c-bc60-6db68b69c3f3",
+   "updated": "2020-01-09T14:32:01Z",
+   "name": "Personal",
+   "description": null,
+   "sortOrder": 0,
+   "isDefault": true,
+   "isSubscribed": true,
+   "shareWith": {
+     "3f1502e0-63fe-4335-9ff3-e739c188f5dd": {
+       "mayRead": true,
+       "mayWrite": false,
+       "mayShare": false,
+       "mayDelete": false
+     }
+   },
+   "myRights": {
+     "mayRead": true,
+     "mayWrite": true,
+     "mayShare": true,
+     "mayDelete": false
+   }
+} 
+```
+
+address-book2.json would contain:
+
+```
+{
+   "@type": "AddressBook",
+   "uid": "cd40089d-35f9-4fd7-980b-ba3a9f1d74fe",
+   "updated": "2020-01-09T14:32:01Z",
+   "name": "Autosaved",
+   "description": null,
+   "sortOrder": 1,
+   "isDefault": false,
+   "isSubscribed": true,
+   "shareWith": null,
+   "myRights": {
+     "mayRead": true,
+     "mayWrite": true,
+     "mayShare": true,
+     "mayDelete": false
+   }
+}
+```
+
+
+Note that the first example includes a `shareWith` value, showing that the user's AddressBook has been
+shared with in this case one other principal with the id "3f1502e0-63fe-4335-9ff3-e739c188f5dd".  
+This information can be exported and may be quite useful in case of backup/restore use cases. 
+However, it may not be useful in other administrative domains where the same concept of principals
+does not allow the Principal ID to be resolved against the correct account.  In any case, the 
+object referred to by this Principal ID is not itself given representation in the PDP Archive export.
+
 
 ### Calendar events, tasks and groups
 
