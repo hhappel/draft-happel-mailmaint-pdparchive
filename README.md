@@ -1,6 +1,6 @@
 # draft-happel-mailmaint-pdparchive
 
-This repo contains sources for https://datatracker.ietf.org/doc/draft-TBD
+This repo contains sources for the [PDPA IETF draft](https://datatracker.ietf.org/doc/html/draft-happel-mailmaint-pdparchive-00)
 
 ## Convert
 This section describes how the markdown source can be converted to XML or PDF.
