@@ -65,13 +65,11 @@ This document proposes the Personal Data Portability Archive format (PDPA), suit
 
 As part of communication protocols, the IETF has standardized a number of data formats such as the Internet Message Format [@RFC5322], vCard [@RFC6350], iCalendar [@RFC5545], or, more recently, JSContact [@RFC9553] and JSCalendar [@RFC8984].
 
-While mainly designed for interoperability, many of these data formats have also become popular for data portability, i.e., the import/export of data across different services.
+While mainly designed for interoperability, many of these data formats have also become popular for data portability, i.e., the import/export of data across different services. The growing importance of data portabilty however demands for an open standard archive format which can deal with different types of personal data in a homegeneous fashion.
 
-The growing importance of data portabilty however demands for an open standard archive format which can deal with different types of personal data in a homegeneous fashion.
+To this end, this document proposes the Personal Data Portability Archive format (PDPA), suitable for import/export, backup/restore, and data transfer scenarios for personal data. It is compatible with both IMAP and JMAP and should be suitable as an interchange format between related software and services such as for email, contacts, calendaring, tasks, or files.
 
-To this end, this document proposes the Personal Data Portability Archive format (PDPA), suitable for import/export, backup/restore, and data transfer scenarios for personal data. It is compatible with both IMAP and JMAP and should be suitable as an interchange format between related software and services such as for email, contacts, calendarding, tasks, or files.
-
-The approach is to define JSON formats (using CDDL), folder structure, and a common compression format.  Additional specifications will likely define how these files can be requested from, imported into, or transferred between servers. 
+The approach is to define JSON formats (using CDDL), folder structure, and a common compression format.  Additional specifications will likely define a protocol how these files can be requested from, imported into, or transferred between servers. 
 
 # Conventions Used in This Document
 
@@ -143,11 +141,11 @@ Besides actual use cases, there are a number of side requirements and goals for 
 
 Data formats should aim for compatibility with JMAP data formats for the sake of interoperability and synergies in software libraries.
 
-Dedicated JMAP API methods for exporting and importing the format described here, or for related server-to-server transfort partocoals are out of the scope of this document.
+Dedicated JMAP API methods for exporting and importing the format described here, or for related server-to-server transfert protocols are out of the scope of this document.
 
-Due to its specfics and ubiquituous usage, the Internet Message Format [@RFC5322]; latest revision of [@RFC2822]/[@RFC822]) should be the core of representing individual email data.
+Due to its specifics and ubiquituous usage, the Internet Message Format [@RFC5322]; latest revision of [@RFC2822]/[@RFC822]) should be the core of representing individual email data.
 
-This specfication should ideally describe mappings between PDPA and existing mailbox persistence schemes such as Maildir or MBOX [@RFC4155].
+This specification should ideally describe mappings between PDPA and existing mailbox persistence schemes such as Maildir or MBOX [@RFC4155].
 
 ### Interoperability
 
@@ -173,7 +171,7 @@ PDPA should allow easy access for local tools (e.g., CLIs). While this may sound
 
 ### Efficiency
 
-Since certain kinds of personal data might involve large quanties of data, major use cases for PDPA should be realizable in an efficient manner.
+Since certain kinds of personal data might involve large quantities of data, major use cases for PDPA should be realizable in an efficient manner.
 
 For now, this is stated as an abstract guiding principle. Its actual dimensions and trade-offs need to be refined while evolving this specification.
 
@@ -189,7 +187,7 @@ This specification follows that pattern in order to build on these partial succe
 
 JSON is used in this spec for new metadata and for objects including contacts, tasks,  events and notes.  However, the Email Message Format [@RFC5322] is used for email message content. Individual items are stored in individual files, which are referenced in collection metadata. Finally these JSON and other file formats are packaged and compressed together in a standard but flexible way.
 
-Our reasoning for using JSON as much as is reasonable:
+Our rationale for using JSON as much as it is reasonable:
 
 * We envision an export format being used not just by developers of full IMAP servers but also by developers building task management systems, calendar systems that don't include email, etc.
 * We should minimize requiring multiple libraries to parse different formats. If the Metadata is going to be in JSON, it would really help to have the item data in JSON.
@@ -219,7 +217,7 @@ Email and calendaring services appear to already do synchronization just fine, b
 
 Archive and export formats aren't part of this client-server model, and the work to make server-to-server or peer-to-peer synchronization work perfectly is substantial (involving features such as version numbers or change logs -- features that aren't commonly standardized for the objects handled in this spec).  Still, there are some things possible with archive formats and the current object definitions that are sensible.  Our approach is to describe what is possible with the fields that exist, and mandate those fields be used, so that users aren't left with multiple locations for their data and no way to repeatedly synchronize them. 
 
-As an illustrative use case, let the user have contacts stored in one email service and also in one mobile device platform doing online backups.  The email platform creates contacts when the user emails new recipients, or recieves contact information over email.  The mobile device platform synchronizes contact information from a phone.  The email service is not a client of the mobile device platform, nor is the mobile device platform a client of the email service, so client-to-server protocols cannot directly synchronize the data between these two services.  A user attempting to solve this by repeatedly importing contacts into one system from the other may find this works poorly - for example, it might create new contact objects over and over for the same contact data even if it is unchanged, and deleted objects may re-animate after being re-copied.
+As an illustrative use case, let the user have contacts stored in one email service and also in one mobile device platform doing online backups.  The email platform creates contacts when the user emails new recipients, or receives contact information over email.  The mobile device platform synchronizes contact information from a phone.  The email service is not a client of the mobile device platform, nor is the mobile device platform a client of the email service, so client-to-server protocols cannot directly synchronize the data between these two services.  A user attempting to solve this by repeatedly importing contacts into one system from the other may find this works poorly - for example, it might create new contact objects over and over for the same contact data even if it is unchanged, and deleted objects may re-animate after being re-copied.
 
 Both servers ought to allow exporting of contact data (along with any other data covered in this specification), including especially the UID and updated (timestamp) fields.   This would allow at least some sensible personal workflows or for 3rd party tools to make synchronization work better.
 
