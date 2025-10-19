@@ -841,6 +841,55 @@ Systems that support mailbox IDs MUST include them in exports.  Systems that do 
 
 Reference [@RFC9404]? 
 
+# Open issues
+
+## Container format
+
+This document leverages existing data formats and adds certain files for representing metadata. While one may work with this raw data, most import/export scenarios will rather require the bundling of individual data items into one or few container files.
+
+This document does not strive to invent its own container format, but may refer to existing ones.
+
+High level options would be:
+
+- Recommend using a container format without preferring a particular one
+- Mandating a specific format
+- ...?
+
+Actual container formats likely differ in various dimensions:
+
+- Ease of adding incremental data
+- Ease of updating existing data
+- Ease of accessing files
+- Support for compression
+- Support for data streaming
+- Availability of library/tool support across platforms
+- Internal file references
+- Open standard
+- ...?
+
+Candidates
+
+- tar/gz
+- zip
+- 7z
+- zpaq
+- ...?
+
+See https://github.com/hhappel/draft-happel-mailmaint-pdparchive/issues/13
+
+
+## Encryption
+
+Support for encryption of any kind is so far no requirement in the draft. However, an increasing number of services offers forms of data encryption. Implications for this draft may be considered.
+
+"Encryption" might refer to various aspects:
+
+- Existing encryption of individual files in the export
+- Encrypting the complete export (incl. metadata?)
+- ...?
+
+See https://github.com/hhappel/draft-happel-mailmaint-pdparchive/issues/14
+
 # Implementation status
 
 < RFC Editor: before publication please remove this section and the reference to [@RFC7942] >
