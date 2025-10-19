@@ -251,16 +251,51 @@ Synchronization requirements
 
 # File format
 
+This section describes the internal "raw" file format of a personal data portability archive. For discussion about a surrounding container format, see section "open issues".
+
+PDPA in general consists of:
+
+- A main metadata file ("index.json")
+- Top-level folders for each data type ("/mail")
+- Subfolders representing actual collections of individual data items plus additional metadata files
+
 ## Index file(s)
 
-(index.json)
 
-* Data source (user, shared)
-    * Which account / which server/service
-* Nature (dump, ...)
-* Dates (created, last update)
-* Sync id?
-* Generator (tool)
+- archive: general information about the archive
+- dataset: characteristics of the dataset itself
+- datasource: meta-information about the dataset
+
+The following sections propose some initial properties which are still subject to discussion.
+
+### Archive section
+
+| Key          | Description         | Example value                   |
+| ------------ | ------------------- | ------------------------------- |
+| id           | Archive identifier  | 123                             |
+| name         | Human readble label | Jane's data export (2025-10-19) |
+| note         | Note                | Personal account export         |
+| legal        | Legal desclaimer    | Private data                    |
+| timestamp    | Archive timestamp   | 2025-10-19-18-00                |
+| version      | PDPA spec version   | PDPA v1.0                       |
+| generator    | Archive generator   | PDPA exporter v0.9              |
+
+### Dataset section
+
+| Key          | Description         | Example value                   |
+| ------------ | ------------------- | ------------------------------- |
+| extent       | Extent of the archive (full, partial) | FULL                             |
+| selector     | Select critia for partial datasets (date, folder, size, custom) | NONE   |                      
+| datatypes    | List of data types   | MAIL   |
+| langaguetag  | BCP 47 language tag for the dominant language in the dataset  | en-ca   |
+| timezone  | IANA tz identifier for the dataset | "America/Montreal"  |
+
+### Datasource section
+
+| Key          | Description         | Example value                   |
+| ------------ | ------------------- | ------------------------------- |
+| service      | Information about the source service (id, url, ..) | TBD |
+| account      | Information about the source account (id, type, ...) | TBD |
 
 ## Folder structure
 
