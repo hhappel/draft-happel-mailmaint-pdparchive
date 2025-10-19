@@ -261,6 +261,7 @@ PDPA in general consists of:
 
 ## Index file(s)
 
+The index.json file consists of three main sections:
 
 - archive: general information about the archive
 - dataset: characteristics of the dataset itself
