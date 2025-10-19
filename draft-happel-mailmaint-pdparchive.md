@@ -65,13 +65,11 @@ This document proposes the Personal Data Portability Archive format (PDPA), suit
 
 As part of communication protocols, the IETF has standardized a number of data formats such as the Internet Message Format [@RFC5322], vCard [@RFC6350], iCalendar [@RFC5545], or, more recently, JSContact [@RFC9553] and JSCalendar [@RFC8984].
 
-While mainly designed for interoperability, many of these data formats have also become popular for data portability, i.e., the import/export of data across different services.
+While mainly designed for interoperability, many of these data formats have also become popular for data portability, i.e., the import/export of data across different services. The growing importance of data portability however demands for an open standard archive format which can deal with different types of personal data in a homogeneous fashion.
 
-The growing importance of data portabilty however demands for an open standard archive format which can deal with different types of personal data in a homegeneous fashion.
+To this end, this document proposes the Personal Data Portability Archive format (PDPA), suitable for import/export, backup/restore, and data transfer scenarios for personal data. It is compatible with both IMAP and JMAP and should be suitable as an interchange format between related software and services such as for email, contacts, calendaring, tasks, or files.
 
-To this end, this document proposes the Personal Data Portability Archive format (PDPA), suitable for import/export, backup/restore, and data transfer scenarios for personal data. It is compatible with both IMAP and JMAP and should be suitable as an interchange format between related software and services such as for email, contacts, calendarding, tasks, or files.
-
-The approach is to define JSON formats (using CDDL), folder structure, and a common compression format.  Additional specifications will likely define how these files can be requested from, imported into, or transferred between servers. 
+The approach is to define JSON formats (using CDDL), folder structure, and a common compression format.  Additional specifications will likely define a protocol how these files can be requested from, imported into, or transferred between servers. 
 
 # Conventions Used in This Document
 
@@ -100,7 +98,7 @@ A main use case for the novel format is to allow exporting the full user data ma
 
 The user might use such export for backup, archiving, or for importing when switching to another service or software (i.e., migration).
 
-Depending on the type of data, exporting/importing can be a time-consuming process. Particularly for the case of switching services, PDPA should allow to minimize the time period during wthich a user cannot use the origin system but also the destination system is not yet ready.
+Depending on the type of data, exporting/importing can be a time-consuming process. Particularly for the case of switching services, PDPA should allow to minimize the time period during which a user cannot use the origin system but also the destination system is not yet ready.
 
 ### Incremental backup
 
@@ -143,15 +141,15 @@ Besides actual use cases, there are a number of side requirements and goals for 
 
 Data formats should aim for compatibility with JMAP data formats for the sake of interoperability and synergies in software libraries.
 
-Dedicated JMAP API methods for exporting and importing the format described here, or for related server-to-server transfort partocoals are out of the scope of this document.
+Dedicated JMAP API methods for exporting and importing the format described here, or for related server-to-server transfer protocols are out of the scope of this document.
 
-Due to its specfics and ubiquituous usage, the Internet Message Format [@RFC5322]; latest revision of [@RFC2822]/[@RFC822]) should be the core of representing individual email data.
+Due to its specifics and ubiquitous usage, the Internet Message Format [@RFC5322]; latest revision of [@RFC2822]/[@RFC822]) should be the core of representing individual email data.
 
-This specfication should ideally describe mappings between PDPA and existing mailbox persistence schemes such as Maildir or MBOX [@RFC4155].
+This specification should ideally describe mappings between PDPA and existing mailbox persistence schemes such as Maildir or MBOX [@RFC4155].
 
 ### Interoperability
 
-It should be mostly possible to use personal data exports from one system with different software or services.  When a source exports personal data it can include all the information it would need for a fully-functional import, _however_ destination systems running different software may not be able to import all of that information (especially if it includes non-standard features) and use it exactly the same way.  This specification does not attempt to achieve perfect interoperability between diverse systems, but instead to make reasonable tradeoffs.
+It should be mostly possible to use personal data exports from one system with different software or services.  When a source exports personal data it can include all the information it would need for a fully-functional import, _however_ destination systems running different software may not be able to import all of that information (especially if it includes non-standard features) and use it exactly the same way.  This specification does not attempt to achieve perfect interoperability between diverse systems, but instead to make reasonable trade-offs.
 
 ### Extensibility
 
@@ -165,7 +163,7 @@ This format should allow flexible granularity in two ways:
 
 2) While ideally representable as a single file, archives may also span several files due to reasons such as file size restrictions or incremental generation logic.
 
-(The ability for a user to export and/or backup an entire email account requires some accomodation of large amounts of data and risks of interruptions in downloads.  Splitting exports into multiple files during export is one possible solution.)
+(The ability for a user to export and/or backup an entire email account requires some accommodation of large amounts of data and risks of interruptions in downloads.  Splitting exports into multiple files during export is one possible solution.)
 
 ### Accessible for local tooling
 
@@ -173,7 +171,7 @@ PDPA should allow easy access for local tools (e.g., CLIs). While this may sound
 
 ### Efficiency
 
-Since certain kinds of personal data might involve large quanties of data, major use cases for PDPA should be realizable in an efficient manner.
+Since certain kinds of personal data might involve large quantities of data, major use cases for PDPA should be realizable in an efficient manner.
 
 For now, this is stated as an abstract guiding principle. Its actual dimensions and trade-offs need to be refined while evolving this specification.
 
@@ -189,7 +187,7 @@ This specification follows that pattern in order to build on these partial succe
 
 JSON is used in this spec for new metadata and for objects including contacts, tasks,  events and notes.  However, the Email Message Format [@RFC5322] is used for email message content. Individual items are stored in individual files, which are referenced in collection metadata. Finally these JSON and other file formats are packaged and compressed together in a standard but flexible way.
 
-Our reasoning for using JSON as much as is reasonable:
+Our rationale for using JSON as much as it is reasonable:
 
 * We envision an export format being used not just by developers of full IMAP servers but also by developers building task management systems, calendar systems that don't include email, etc.
 * We should minimize requiring multiple libraries to parse different formats. If the Metadata is going to be in JSON, it would really help to have the item data in JSON.
@@ -219,7 +217,7 @@ Email and calendaring services appear to already do synchronization just fine, b
 
 Archive and export formats aren't part of this client-server model, and the work to make server-to-server or peer-to-peer synchronization work perfectly is substantial (involving features such as version numbers or change logs -- features that aren't commonly standardized for the objects handled in this spec).  Still, there are some things possible with archive formats and the current object definitions that are sensible.  Our approach is to describe what is possible with the fields that exist, and mandate those fields be used, so that users aren't left with multiple locations for their data and no way to repeatedly synchronize them. 
 
-As an illustrative use case, let the user have contacts stored in one email service and also in one mobile device platform doing online backups.  The email platform creates contacts when the user emails new recipients, or recieves contact information over email.  The mobile device platform synchronizes contact information from a phone.  The email service is not a client of the mobile device platform, nor is the mobile device platform a client of the email service, so client-to-server protocols cannot directly synchronize the data between these two services.  A user attempting to solve this by repeatedly importing contacts into one system from the other may find this works poorly - for example, it might create new contact objects over and over for the same contact data even if it is unchanged, and deleted objects may re-animate after being re-copied.
+As an illustrative use case, let the user have contacts stored in one email service and also in one mobile device platform doing online backups.  The email platform creates contacts when the user emails new recipients, or receives contact information over email.  The mobile device platform synchronizes contact information from a phone.  The email service is not a client of the mobile device platform, nor is the mobile device platform a client of the email service, so client-to-server protocols cannot directly synchronize the data between these two services.  A user attempting to solve this by repeatedly importing contacts into one system from the other may find this works poorly - for example, it might create new contact objects over and over for the same contact data even if it is unchanged, and deleted objects may re-animate after being re-copied.
 
 Both servers ought to allow exporting of contact data (along with any other data covered in this specification), including especially the UID and updated (timestamp) fields.   This would allow at least some sensible personal workflows or for 3rd party tools to make synchronization work better.
 
@@ -249,7 +247,7 @@ Compression and packaging of resources
 Synchronization requirements
 
 * Can see which items are identical in two systems, e.g. one system previously imported an item exported by the other.
-* Can detect changes made since the last time an item was imported, in a way that supports replacing an older vesion previously synchronized with a newer version that has edits.
+* Can detect changes made since the last time an item was imported, in a way that supports replacing an older version previously synchronized with a newer version that has edits.
 
 # File format
 
@@ -771,7 +769,7 @@ This section describes the requirements to achieve repeated one-way synchronizat
 
 Supporting _repeated_ synchronization means that the export from system A and import to system B can happen over and over again without needlessly duplicating items.  Supporting _one-way_ synchronization means that changes in the system with the exporter role propagate reliably to the system with the importer role, but not in the reverse direction.   Some of the constraints here arise from the fact that the two systems may not directly connect, and the import may be time-delayed from the export.
 
-This limited solution for export/import synch may also be used for more direct system-to-system transfers such as service-to-service data transfers, repeated data access requests or data migrations, although some of those use cases could be solved much better with direct negotiation of features. 
+This limited solution for export/import sync may also be used for more direct system-to-system transfers such as service-to-service data transfers, repeated data access requests or data migrations, although some of those use cases could be solved much better with direct negotiation of features. 
 
 ### Always include 'uid' and 'updated' 
 
@@ -790,7 +788,7 @@ Recommendations:
 * Importers SHOULD apply common sense in updating internal or implementation-specific fields.  This specification does not require the importer to include, omit, handle or disregard values for fields that it believes are internally-generated or implementation-specific.  For example, a system in the role of exporter might export an event object with a video-conference room ID in a custom field.  It can decide that it is sensible to export that value as a URL for external use.  Later, the same system or one with code written for compatibility could import that event with the video-conference URL, and it would be sensible to avoid overwriting its own knowledge of the room ID with the URL.
 * When importing a _changed_ or _new_ object with a UID and 'updated' value, the importer SHOULD set the 'updated' value to the one imported. Thus, if a Contact is updated on Jan 1, exported on Jan 2 and imported on Jan 3, the new or updated imported contact would show an 'updated' value of Jan 1. 
 
-Note on _similar enough_: This specification requires nuance in order to allow both reasonably consistent synchronization and reasonable behavior in a wide variety of use cases and implementations.  The language above is intended to give implementors both guidance and wiggle room.  For example, the importer could convert a DTSTART time from UTC to the user's local time and save it as the displayed start time. Later, reimporting the same object with the same UID, the importing code could be smart enough to realize that the time hasn't _actually_ changed, and avoid changing the 'updated' timestamp or creating a conflicting event.  This logic could be implemented by saving separate fields (imported time vs display time), by keeping a log of updates (log entry stating that the system auto-converted start time from X to Y), or by other clever algorithms. Thus, the clever implementation can avoid the appearance of an object that changes every time the calendar is synchronized.
+Note on _similar enough_: This specification requires nuance in order to allow both reasonably consistent synchronization and reasonable behavior in a wide variety of use cases and implementations.  The language above is intended to give implementors both guidance and wiggle room.  For example, the importer could convert a DTSTART time from UTC to the user's local time and save it as the displayed start time. Later, re-importing the same object with the same UID, the importing code could be smart enough to realize that the time hasn't _actually_ changed, and avoid changing the 'updated' timestamp or creating a conflicting event.  This logic could be implemented by saving separate fields (imported time vs display time), by keeping a log of updates (log entry stating that the system auto-converted start time from X to Y), or by other clever algorithms. Thus, the clever implementation can avoid the appearance of an object that changes every time the calendar is synchronized.
 
 Note on _updated_: The definition of 'updated' in JSContact [@RFC9553] is not rigorous or nuanced. "when the data in the Card was last modified" could refer to several instances of the card -- its internal implementation, its representation in an email share, its representation in an HTTP GET response [@RFC6352].   It's not specified whether 'updated' is the same as REV in VCard [@RFC6350], which is defined differently.  Neither definition explicitly covers vendor-specific fields.  Thus, this specification makes additional recommendations for handling 'updated': 
 
