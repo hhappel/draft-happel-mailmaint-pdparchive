@@ -14,14 +14,14 @@ initials="L."
 surname="Dusseault"
 fullname="Lisa Dusseault"
 role="editor"
-organization = "tbd"
+organization = "Data Transfer Initiative"
    [author.address]
-   email = "tbd"
-   uri = "tbd"
+   email = "lisa@dtinit.org"
+   uri = "https://www.dtinit.org"
    [author.address.postal]
-      street = "tbd"
-      city = "tbd "
-      code = "tbd"
+      street = "2661 N Pearl St #404"
+      city = "Tacoma, WA"
+      code = "98407"
       country = "USA"
 
 [[author]]
