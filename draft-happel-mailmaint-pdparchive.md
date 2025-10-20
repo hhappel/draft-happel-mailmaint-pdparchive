@@ -479,6 +479,41 @@ Example of folder.json (full export):
 }
 ```
 
+Example of folder.json that shows incremental changes from the previous export shown above.
+In this example 2 messages with UIDs 3 and 15 were removed. Message with UID 1 has updated
+flags. Several new messages were added, some of them are with flags set.
+```asciidoc=
+{
+  "allowed_keywords": ["$Forwarded", "$MDNSent", "$ismailinglist"],
+  "last_uid": 21,
+  "highest_modseq": 6371845,
+  "recent_uid": 20,
+  "uidvalidity": 1107190787,
+  "is_subscribed": true,
+  "role": "sent",
+  "sort_order": 1,
+  "myrights": "rwiptsldaex",
+
+  "uids": {
+     1: "msg-1.eml",
+     17: "msg-17.eml",
+     19: "msg-19.eml",
+     20: "20.eml",
+     21: "21.eml"
+  },
+
+  "flags": {
+     1: ["$seen", "$answered"],
+     17: ["$seen", "$answered", "$forwarded"],
+     19: ["$seen"],
+     20: [],
+     21: []
+  },
+
+  "removed": [3, 15]
+}
+```
+
 ### Contacts
 
 VCard [@RFC6350] has long been the basis for address book and contact data representation in
